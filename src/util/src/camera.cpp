@@ -45,29 +45,29 @@ glm::mat4 Camera::getViewMatrix()
 
 void Camera::moving(float* Move) 
 {
-	if (Is_jumping){
-		float time_jump = (std::clock() - this->time_start_jump);
-		time_jump /= 1000;
-		float jump_hight;
+	// if (Is_jumping){
+	// 	float time_jump = (std::clock() - this->time_start_jump);
+	// 	time_jump /= 1000;
+	// 	float jump_hight;
 
-		if (Is_falling){
-			jump_hight = -G_CONSTANT*std::pow(time_jump, 2)/2;
-		}
-		else {jump_hight = (this->speed_j*time_jump - G_CONSTANT*std::pow(time_jump, 2)/2);}
-		if (jump_hight < 0 && !Is_falling){
-			this->time_start_jump = std::clock();
-			this->Is_falling = true;
-		}
+	// 	if (Is_falling){
+	// 		jump_hight = -G_CONSTANT*std::pow(time_jump, 2)/2;
+	// 	}
+	// 	else {jump_hight = (this->speed_j*time_jump - G_CONSTANT*std::pow(time_jump, 2)/2);}
+	// 	if (jump_hight < 0 && !Is_falling){
+	// 		this->time_start_jump = std::clock();
+	// 		this->Is_falling = true;
+	// 	}
 		
-		Camera_pos = glm::vec3(Camera_pos.x, 
-							Camera_pos.y + jump_hight, 
-							Camera_pos.z);
-	}
-	if (Camera_pos.y - PLAYER_HIGHT < HIGHT_MAP){
-		Camera_pos.y = HIGHT_MAP + PLAYER_HIGHT;
-		this->Is_jumping = false;
-		this->Is_falling = false;
-	}
+	// 	Camera_pos = glm::vec3(Camera_pos.x, 
+	// 						Camera_pos.y + jump_hight, 
+	// 						Camera_pos.z);
+	// }
+	// if (Camera_pos.y - PLAYER_HIGHT < HIGHT_MAP){
+	// 	Camera_pos.y = HIGHT_MAP + PLAYER_HIGHT;
+	// 	this->Is_jumping = false;
+	// 	this->Is_falling = false;
+	// }
 
 	if (!Is_moving){return;}
 	float time_move = (std::clock() - this->time_norm) ;
@@ -78,7 +78,10 @@ void Camera::moving(float* Move)
 	Camera_pos = glm::vec3(Camera_pos.x + Side_vector.x * Move[0] * speed_m *time_move, 
 						   Camera_pos.y, 
 						   Camera_pos.z + Side_vector.z * Move[0] * speed_m *time_move);
-	
+
+	Camera_pos = glm::vec3(Camera_pos.x, 
+						   Camera_pos.y + Move[1] * speed_m *time_move, 
+						   Camera_pos.z);
 	this->time_norm = std::clock();
 }
 
@@ -155,14 +158,11 @@ void Camera::control_moving(){
 		move[0] -= 0.1;
 	}
 	if (key[SDL_SCANCODE_SPACE]){
-		if (!Is_jumping){
-			time_start_jump = std::clock();
-			Is_jumping = true;
-		}
+		move[1] += 0.1;
 	}
-	// if (key[SDL_SCANCODE_LSHIFT]){
-	// 	move[1] -= 0.1;
-	// }
+	if (key[SDL_SCANCODE_LSHIFT]){
+		move[1] -= 0.1;
+	}
 	if (Is_moving){if (move[0] == 0 && move[1] == 0 && move[2] == 0) Is_moving = false;}
 	else{
 	if (move[0] != 0 || move[1] != 0 || move[2] != 0){
