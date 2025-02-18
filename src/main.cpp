@@ -81,7 +81,7 @@ int main(int argv, char *argc[]){
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, (void*)(sizeof(float)*3));
     glBindVertexArray(0);
 
-    float Vertices_quad[] = {
+    float Vertices_quad[] = { 
         // positions        // texture Coords
         -1.0f, 0.0f,  1.0f, 0.0f, 1.0f,
         -1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
@@ -111,7 +111,8 @@ int main(int argv, char *argc[]){
         float near = 0.7f, far = 10.0f;
         glm::vec3 LightPos(5.0f);  
   
-        projection =  glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near, far);
+        // projection =  glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near, far);
+        projection = glm::perspective(glm::radians(45.0f), SHADOW_WIDTH / static_cast<float>(SHADOW_HEIGHT), near, far);
         view = glm::lookAt(LightPos, glm::vec3(0), glm::vec3(0.0, 1.0, 0.0));
         model = glm::mat4(1.0f);
         model = glm::mat4(1.0f);
@@ -138,7 +139,10 @@ int main(int argv, char *argc[]){
         shadow_map.uniformMat4f("projection", 1, false, Main_view.getProjection_matrix(WIDTH_WIN, HIGHT_WIN));
         shadow_map.uniformMat4f("view", 1, false, Main_view.getViewMatrix());
         shadow_map.uniformMat4f("model", 1, false, Main_view.getModelMatrix(glm::vec3(0.0f), Angle_rotate, VECTOR_ROTATE));
-  
+        
+        shadow_map.uniformFloat("near_plane", near);
+        shadow_map.uniformFloat("far_plane", far);
+
         glActiveTexture(GL_TEXTURE0);  
         glBindTexture(GL_TEXTURE_2D, depthMap);
         glBindVertexArray(render_data.VAO);
@@ -162,7 +166,7 @@ int main(int argv, char *argc[]){
                         SDL_SetRelativeMouseMode(SDL_TRUE);
                     }
                 }
-            }
+            } 
         }        
         screen.swap_buffer();
     }
