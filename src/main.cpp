@@ -56,36 +56,37 @@ int main(int argv, char *argc[]){
     shadow_map.activate();
     shadow_map.uniformInt("deepMap", 0);
 
-    std::vector<float> Verticese
-    {
-        // ground faces
-        -10, 0, -10,
-         10, 0, -10,
-         10, 0,  10,
-        -10, 0, -10,
-         10, 0,  10,
-        -10, 0,  10
+    float Verticese[] = {  
+        // ground faces  
+        -10.0f, 0.0f, -10.0f, 0.0f, 1.0f,
+         10.0f, 0.0f, -10.0f, 0.0f, 0.0f,
+         10.0f, 0.0f,  10.0f, 1.0f, 1.0f,
+        -10.0f, 0.0f, -10.0f, 0.0f, 1.0f,  
+         10.0f, 0.0f,  10.0f, 1.0f, 1.0f,
+        -10.0f, 0.0f,  10.0f, 1.0f, 0.0f,
 
-        -3, 3, -3,
-         3, 3, -3,
-         3, 0,  3,
-        -3, 3, -3,
-         3, 0,  3,
-        -3, 2,  3
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+         0.5f, 0.5f, -0.5f, 0.0f, 0.0f,
+         0.5f, 0.5f,  0.5f, 1.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+         0.5f, 0.5f,  0.5f, 1.0f, 1.0f,
+        -0.5f, 0.5f,  0.5f, 1.0f, 0.0f
     };
 
     Buffer_data render_data;
-    glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)(sizeof(float)*Verticese.size()), Verticese.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Verticese), &Verticese, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, (void*)(sizeof(float)*3));
     glBindVertexArray(0);
 
     float Vertices_quad[] = {
         // positions        // texture Coords
-        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-         1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-         1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        -1.0f, 0.0f,  1.0f, 0.0f, 1.0f,
+        -1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+         1.0f, 0.0f,  1.0f, 1.0f, 1.0f,
+         1.0f, 0.0f, -1.0f, 1.0f, 0.0f,
     };
     Buffer_data quad_data;
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices_quad), &Vertices_quad, GL_STATIC_DRAW);
@@ -100,17 +101,17 @@ int main(int argv, char *argc[]){
     SDL_Event event;
     float move = 0;
     while (running){
-        move -= 0.001;
+        //move -= 0.001;
         Main_view.control_mouse(screen, WIDTH_WIN, HIGHT_WIN);
         Main_view.control_moving();
         screen.clear_color(SKY_COLOR.x, SKY_COLOR.y, SKY_COLOR.z, SKY_COLOR.a);
-   
+    
         deep_map.activate();
         glm::mat4 view, projection, model;
         float near = 0.7f, far = 10.0f;
-        glm::vec3 LightPos(3.0f + move);
- 
-        projection =  glm::ortho(-30.0f, 30.0f, -30.0f, 30.0f, near, far);
+        glm::vec3 LightPos(5.0f);  
+  
+        projection =  glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near, far);
         view = glm::lookAt(LightPos, glm::vec3(0), glm::vec3(0.0, 1.0, 0.0));
         model = glm::mat4(1.0f);
         model = glm::mat4(1.0f);
@@ -126,19 +127,24 @@ int main(int argv, char *argc[]){
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
             glClear(GL_DEPTH_BUFFER_BIT);
             glBindVertexArray(render_data.VAO);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
+            glDrawArrays(GL_TRIANGLES, 0, 12);
             glBindVertexArray(0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+ 
         glViewport(0, 0, WIDTH_WIN, HIGHT_WIN);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shadow_map.activate();
-        glActiveTexture(GL_TEXTURE0);
+        shadow_map.uniformMat4f("Light_matrix", 1, false, lightMatrix);
+        shadow_map.uniformMat4f("projection", 1, false, Main_view.getProjection_matrix(WIDTH_WIN, HIGHT_WIN));
+        shadow_map.uniformMat4f("view", 1, false, Main_view.getViewMatrix());
+        shadow_map.uniformMat4f("model", 1, false, Main_view.getModelMatrix(glm::vec3(0.0f), Angle_rotate, VECTOR_ROTATE));
+  
+        glActiveTexture(GL_TEXTURE0);  
         glBindTexture(GL_TEXTURE_2D, depthMap);
-        glBindVertexArray(quad_data.VAO);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glBindVertexArray(render_data.VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 12);
         glBindVertexArray(0);
-
+ 
         //skybox_game.render_skybox(Main_view);
         
         while (SDL_PollEvent(&event)) {
