@@ -28,7 +28,8 @@ int main(int argv, char *argc[]){
     Skybox skybox_game("resources/shader_source/cubemap_vshader.vert", "resources/shader_source/cubemap_fshader.frag", SkyBox_image_path);
 
     ShaderProgram deep_map("resources/shader_source/deep_map_vshader.vert", 
-                           "resources/shader_source/deep_map_fshader.frag");
+                           "resources/shader_source/deep_map_fshader.frag",
+                           "resources/shader_source/deep_map_gshader.gs");
     ShaderProgram shadow_map("resources/shader_source/simple_shadow_map_vshader.vert", 
                              "resources/shader_source/simple_shadow_map_fshader.frag");
 
