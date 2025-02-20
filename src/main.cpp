@@ -32,7 +32,7 @@ int main(int argv, char *argc[]){
     ShaderProgram shadow_map("resources/shader_source/simple_shadow_map_vshader.vert", 
                              "resources/shader_source/simple_shadow_map_fshader.frag");
 
-    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    const unsigned int SHADOW_WIDTH = 1024*4, SHADOW_HEIGHT = 1024*4;
     unsigned int depthMapFBO;
     glGenFramebuffers(1, &depthMapFBO);
     // create depth texture
@@ -58,27 +58,25 @@ int main(int argv, char *argc[]){
 
     float Verticese[] = {  
         // ground faces  
-        -10.0f, 0.0f, -10.0f, 0.0f, 1.0f,
-         10.0f, 0.0f, -10.0f, 0.0f, 0.0f,
-         10.0f, 0.0f,  10.0f, 1.0f, 1.0f,
-        -10.0f, 0.0f, -10.0f, 0.0f, 1.0f,  
-         10.0f, 0.0f,  10.0f, 1.0f, 1.0f,
-        -10.0f, 0.0f,  10.0f, 1.0f, 0.0f,
+        -10.0f, 0.0f, -10.0f,
+         10.0f, 0.0f, -10.0f,
+         10.0f, 0.0f,  10.0f,
+        -10.0f, 0.0f, -10.0f,  
+         10.0f, 0.0f,  10.0f,
+        -10.0f, 0.0f,  10.0f,
 
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-         0.5f, 0.5f, -0.5f, 0.0f, 0.0f,
-         0.5f, 0.5f,  0.5f, 1.0f, 1.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-         0.5f, 0.5f,  0.5f, 1.0f, 1.0f,
-        -0.5f, 0.5f,  0.5f, 1.0f, 0.0f
+        -3.0f, 1.5f, -3.0f,
+         3.0f, 1.5f, -3.0f,
+         3.0f, 1.5f,  3.0f,
+        -3.0f, 1.5f, -3.0f,
+         3.0f, 1.5f,  3.0f,
+        -3.0f, 1.5f,  3.0f
     };
 
     Buffer_data render_data;
     glBufferData(GL_ARRAY_BUFFER, sizeof(Verticese), &Verticese, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, (void*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, (void*)(sizeof(float)*3));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, (void*)0);
     glBindVertexArray(0);
 
     float Vertices_quad[] = { 
@@ -108,8 +106,8 @@ int main(int argv, char *argc[]){
     
         deep_map.activate();
         glm::mat4 view, projection, model;
-        float near = 0.7f, far = 10.0f;
-        glm::vec3 LightPos(5.0f);  
+        float near = 0.7f, far = 100.0f;
+        glm::vec3 LightPos(10.0f);  
   
         // projection =  glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near, far);
         projection = glm::perspective(glm::radians(45.0f), SHADOW_WIDTH / static_cast<float>(SHADOW_HEIGHT), near, far);

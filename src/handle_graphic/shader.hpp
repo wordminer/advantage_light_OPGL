@@ -16,7 +16,7 @@ void programLinkingFailcheck(const GLuint& ID);
 class ShaderProgram {
 public:
     ShaderProgram();
-    ShaderProgram(const char* vshader_filename, const char* fshader_filename);
+    ShaderProgram(const char* vshader_filename, const char* fshader_filename, const char* geometry_filename = nullptr);
 
     void activate();
     void purge();

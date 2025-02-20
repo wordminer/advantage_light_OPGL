@@ -39,9 +39,14 @@ void programLinkingFailcheck(const GLuint& ID) {
 
 ShaderProgram::ShaderProgram() {}
 
-ShaderProgram::ShaderProgram(const char* vshader_file, const char* fshader_file) {
+ShaderProgram::ShaderProgram(const char* vshader_file, const char* fshader_file, const char* geometry_filename) {
     std::string vshader_content = getFileContent(vshader_file);
     std::string fshader_content = getFileContent(fshader_file);
+    std::string geometryCode;
+    if(geometry_filename != nullptr)
+    {
+        std::string geometryCode = getFileContent(geometry_filename);
+    }
 
     const char* vshader_source = vshader_content.c_str();
     const char* fshader_source = fshader_content.c_str();
@@ -59,8 +64,21 @@ ShaderProgram::ShaderProgram(const char* vshader_file, const char* fshader_file)
     shaderCompilationFailcheck(vshader);
     shaderCompilationFailcheck(fshader);
 
+    unsigned int geometry;
+    if(geometry_filename != nullptr)
+    {
+        const char * gShaderCode = geometryCode.c_str();
+        geometry = glCreateShader(GL_GEOMETRY_SHADER);
+        glShaderSource(geometry, 1, &gShaderCode, NULL);
+        glCompileShader(geometry);
+        shaderCompilationFailcheck(geometry);
+    }
+
     glAttachShader(m_ID, vshader);
     glAttachShader(m_ID, fshader);
+
+    if(geometry_filename != nullptr)
+        glAttachShader(m_ID, geometry);
 
     glLinkProgram(m_ID);
 
@@ -68,6 +86,8 @@ ShaderProgram::ShaderProgram(const char* vshader_file, const char* fshader_file)
 
     glDeleteShader(vshader);
     glDeleteShader(fshader);
+    if(geometry_filename != nullptr)
+        glDeleteShader(geometry);
 }
 
 void ShaderProgram::activate() {
