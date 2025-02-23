@@ -277,17 +277,17 @@ int main(int argv, char *argc[]){
     Light_info red_light{
         glm::vec3(1.0f, 3.0f, 0.5f),
         125.0f,
-        glm::vec3(0.3f, 0.0f, 0.0f)
+        glm::vec3(0.3f, 0.3f, 0.3f)
     };
     Light_info green_light{
         glm::vec3(3.0f, -0.5f, 0.5f),
         125.0f,
-        glm::vec3(0.0f, 0.3f, 0.0f)
+        glm::vec3(0.3f, 0.3f, 0.3f)
     };
     Light_info blue_light{
         glm::vec3(1.0f, 2.0f, 1.5f),
         125.0f,
-        glm::vec3(0.0f, 0.0f, 0.3f)
+        glm::vec3(0.3f, 0.3f, 0.3f)
     };
     Light_info Lights[] = {red_light, green_light, blue_light};
 
@@ -319,7 +319,7 @@ int main(int argv, char *argc[]){
                 deep_map.use();
                 for (int i = 0; i < 6; i ++){
                     deep_map.setMat4(("PointMatrix[" + std::to_string(i) + "]").c_str(), shadowTransforms[i]);}
-                deep_map.setVec3("LightPos", lightPos);
+                deep_map.setVec3("LightPos",Lights[light].lightPos);
                 deep_map.setFloat("far_plane", far_plane);
                 render_sence(deep_map, &render_data, &flat_data, Texture);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
